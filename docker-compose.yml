@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  backend:
+    image: 491085426369.dkr.ecr.ap-south-1.amazonaws.com/webelight-solutions-backend:latest  # Replace with your ECR image
+    container_name: backend_app
+    restart: always
+    ports:
+      - "5000:5000"
+    env_file:
+      - .env  # Load environment variables from the .env file
+    depends_on:
+      - mongo
+      - redis
+    volumes:
+      - backend-volume:/app  # Mount backend volume
+    networks:
+      - app_network
+
+  mongo:
+    image: mongo
+    container_name: mongo_db
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-volume:/data/db  # Mount MongoDB volume
+    networks:
+      - app_network
+
+  redis:
+    image: redis
+    container_name: redis_cache
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-volume:/data  # Mount Redis volume
+    networks:
+      - app_network
+
+volumes:
+  backend-volume:
+  mongo-volume:
+  redis-volume:
+
+networks:
+  app_network:
+    driver: bridge
+
